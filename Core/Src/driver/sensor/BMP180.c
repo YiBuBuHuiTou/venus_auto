@@ -45,9 +45,13 @@ static double ATMOSPHERE = 101325.0F;
 void initBMP180( unsigned char oss ) {
 	unsigned char cali[22];
 	// 设定BMP180 功率
-	OSS = oss;
+	if ( oss > 3U ) {
+		OSS = 3;
+	} else {
+		OSS = 0;
+	}
 	//读取EEP的值 设备地址0xEF
-	HAL_I2C_Mem_Read(&hi2c2, 0xEF, EEPROM_START_ADDR,      I2C_MEMADD_SIZE_8BIT, cali, sizeof(cali), 1);
+	HAL_I2C_Mem_Read(&hi2c2, 0xEF, EEPROM_START_ADDR,      I2C_MEMADD_SIZE_8BIT, cali, sizeof(cali), 1U);
 	AC1 = (signed short int)( (cali[0]<<8)+ cali[1] );
 	AC2 = (signed short int)( (cali[2]<<8) + cali[3] );
 	AC3 = (signed short int)( (cali[4]<<8) + cali[5] );

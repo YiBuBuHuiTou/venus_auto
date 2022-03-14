@@ -13,6 +13,7 @@
 #include "io_cfg.h"
 #include "i2c.h"
 #include "math.h"
+#include "io_cfg.h"
 
 enum BMP180_OSS{
 	BMP180_LOW,
