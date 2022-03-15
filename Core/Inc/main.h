@@ -58,6 +58,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BPM180_SCL I2C2_SCL
+#define BMP180_SDA I2C2_SDA
+#define DHT20_SCL I2C1_SCL
+#define DHT20_SDA I2C1_SDA
 #define I2C2_SCL_Pin GPIO_PIN_10
 #define I2C2_SCL_GPIO_Port GPIOB
 #define I2C_SDA_Pin GPIO_PIN_11

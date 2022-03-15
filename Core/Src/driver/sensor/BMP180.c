@@ -15,15 +15,6 @@
 
 #include "BMP180.h"
 
-#define EEPROM_START_ADDR   ( 0xAA )
-#define EEPROM_END_ADDR     ( 0xBF )
-#define BMP180_UT_REG_MSB   ( 0xF6 )
-#define BMP180_UT_REG_LSB   ( 0xF7 )
-#define BMP180_UP_REG_MSB   ( 0xF6 )
-#define BMP180_UP_REG_LSB   ( 0xF7 )
-#define BMP180_UP_REG_XLSB  ( 0xF8 )
-
-
 static short int AC1;
 static short int AC2;
 static short int AC3;
@@ -39,11 +30,15 @@ static short int MD;
 static unsigned char OSS;
 //标准大气压
 static double ATMOSPHERE = 101325.0F;
+//i2c
+I2C_HandleTypeDef hi2c;
 /*
  * 初始化BMP180（设定功率模式，获取EEP中的校准值，用来进行对温度和大气压进行温度补偿）
  */
-void initBMP180( unsigned char oss ) {
+void initBMP180(I2C_HandleTypeDef* i2c, unsigned char oss ) {
 	unsigned char cali[22];
+	// 设置i2c总线
+	hi2c = *i2c;
 	// 设定BMP180 功率
 	if ( oss > 3U ) {
 		OSS = 3;
@@ -51,7 +46,7 @@ void initBMP180( unsigned char oss ) {
 		OSS = 0;
 	}
 	//读取EEP的值 设备地址0xEF
-	HAL_I2C_Mem_Read(&hi2c2, 0xEF, EEPROM_START_ADDR,      I2C_MEMADD_SIZE_8BIT, cali, sizeof(cali), 1U);
+	HAL_I2C_Mem_Read(&hi2c, 0xEF, EEPROM_START_ADDR,      I2C_MEMADD_SIZE_8BIT, cali, sizeof(cali), 1U);
 	AC1 = (signed short int)( (cali[0]<<8)+ cali[1] );
 	AC2 = (signed short int)( (cali[2]<<8) + cali[3] );
 	AC3 = (signed short int)( (cali[4]<<8) + cali[5] );
@@ -72,10 +67,10 @@ long readRawUT( void ) {
 	unsigned char ut_uncomp[2];
 	// 向设备F4写入0x2E
 	unsigned char ut_temp = 0x2E;
-	HAL_I2C_Mem_Write(&hi2c2, 0xEE, 0xF4, I2C_MEMADD_SIZE_8BIT, &ut_temp, sizeof(ut_temp), 1);
+	HAL_I2C_Mem_Write(&hi2c, 0xEE, 0xF4, I2C_MEMADD_SIZE_8BIT, &ut_temp, sizeof(ut_temp), 1);
 	osDelay(10);
 	//读取温度
-	HAL_I2C_Mem_Read(&hi2c2, 0xEF, 0xF6, I2C_MEMADD_SIZE_8BIT, ut_uncomp, sizeof(ut_uncomp), 1);
+	HAL_I2C_Mem_Read(&hi2c, 0xEF, 0xF6, I2C_MEMADD_SIZE_8BIT, ut_uncomp, sizeof(ut_uncomp), 1);
 
 	return (long)((ut_uncomp[0] << 8) + ut_uncomp[1]);
 }
@@ -88,10 +83,10 @@ long readRawUP( void ) {
 	unsigned char up_uncomp[3];
 	// 向设备F4写入0x34/0x74/0xB4/0xF4(控制采样率)
 	unsigned char up_temp = 0xF4;
-	HAL_I2C_Mem_Write(&hi2c2, 0xEE, 0xF4, I2C_MEMADD_SIZE_8BIT, &up_temp, sizeof(up_temp), 1);
+	HAL_I2C_Mem_Write(&hi2c, 0xEE, 0xF4, I2C_MEMADD_SIZE_8BIT, &up_temp, sizeof(up_temp), 1);
 	osDelay(50);
 	//读取气压
-	HAL_I2C_Mem_Read(&hi2c2, 0xEF, 0xF6, I2C_MEMADD_SIZE_8BIT, up_uncomp, sizeof(up_uncomp), 1);
+	HAL_I2C_Mem_Read(&hi2c, 0xEF, 0xF6, I2C_MEMADD_SIZE_8BIT, up_uncomp, sizeof(up_uncomp), 1);
 
 	return (long)(((up_uncomp[0] << 16) + (up_uncomp[1] << 8) + up_uncomp[2]) >> (8 - OSS));
 }
