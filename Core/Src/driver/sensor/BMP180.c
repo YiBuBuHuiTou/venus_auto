@@ -161,6 +161,26 @@ void BMP180_readData( float* temperature, long* pressure, float* altitude ) {
     *pressure = p + ((x1 + x2 + 3791) >> 4);
     // hight of sea level  海拔
   	*altitude = 44330 * ( 1 - pow( *pressure/ATMOSPHERE, 1.0F / 5.255F));
+
+
+  	unsigned char temp[] = "\r\ntemp: ";
+  	unsigned char press[] = "\r\npress: ";
+  	unsigned char alt[] = "\r\nalt :";
+  	unsigned char temp_dst[4];
+  	float2char(temperature, temp_dst);
+  	unsigned char press_dst[4];
+  	int2char(pressure, press_dst);
+  	unsigned char alt_dst[4];
+  	int2char(altitude, alt_dst);
+  	HAL_UART_Transmit(&huart1, temp, sizeof(temp), 5);
+  	HAL_UART_Transmit(&huart1, temp_dst, sizeof(temp_dst), 5);
+
+  	HAL_UART_Transmit(&huart1, press, sizeof(press), 5);
+  	HAL_UART_Transmit(&huart1, press_dst, sizeof(press_dst), 5);
+
+  	HAL_UART_Transmit(&huart1, alt, sizeof(alt), 5);
+  	HAL_UART_Transmit(&huart1, alt_dst, sizeof(alt_dst), 5);
+
 }
 
 

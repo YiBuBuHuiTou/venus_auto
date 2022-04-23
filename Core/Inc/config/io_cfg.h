@@ -11,7 +11,6 @@
 #include "main.h"
 
 /* BMP180 IO 设置*/
-#define BPM180_SCL I2C2_SCL_Pin
-#define BMP180_SDA I2C2_SDA_Pin
+
 
 #endif /* SRC_CONFIG_IO_CFG_H_ */

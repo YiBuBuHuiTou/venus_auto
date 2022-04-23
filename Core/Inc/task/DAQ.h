@@ -9,7 +9,11 @@
 #define SRC_TASK_INF_DAQ_H_
 
 
+#include "BMP180.h"
+#include "DHT20.h"
 
+#include "io_cfg.h"
+#include "i2c.h"
 
 
 extern void DAQ_Init( void );

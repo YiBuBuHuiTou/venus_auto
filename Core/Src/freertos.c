@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "DAQ.h"
+#include "OsConfig.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +56,13 @@ const osThreadAttr_t DAQ_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for OsConfigTask */
+osThreadId_t OsConfigTaskHandle;
+const osThreadAttr_t OsConfigTask_attributes = {
+  .name = "OsConfigTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -62,6 +70,7 @@ const osThreadAttr_t DAQ_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void StartDAQTask(void *argument);
+void OsConfig(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -95,6 +104,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of DAQ */
   DAQHandle = osThreadNew(StartDAQTask, NULL, &DAQ_attributes);
 
+  /* creation of OsConfigTask */
+  OsConfigTaskHandle = osThreadNew(OsConfig, NULL, &OsConfigTask_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -116,13 +128,37 @@ void StartDAQTask(void *argument)
 {
   /* USER CODE BEGIN StartDAQTask */
   DAQ_Init();
+
   /* Infinite loop */
   for(;;)
   {
 	DAQ();
+
     osDelay(1000);
   }
   /* USER CODE END StartDAQTask */
+}
+
+/* USER CODE BEGIN Header_OsConfig */
+/**
+* @brief Function implementing the OsConfigTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_OsConfig */
+void OsConfig(void *argument)
+{
+  /* USER CODE BEGIN OsConfig */
+
+  OS_Config_Init();
+
+  /* Infinite loop */
+  for(;;)
+  {
+	OS_Config();
+    osDelay(500);
+  }
+  /* USER CODE END OsConfig */
 }
 
 /* Private application code --------------------------------------------------*/

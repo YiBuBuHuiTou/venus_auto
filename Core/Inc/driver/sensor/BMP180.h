@@ -14,6 +14,8 @@
 #include "i2c.h"
 #include "math.h"
 #include "io_cfg.h"
+#include "usart.h"
+#include "data_convert.h"
 
 enum BMP180_OSS{
 	BMP180_LOW,
